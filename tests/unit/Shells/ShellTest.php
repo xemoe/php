@@ -1,6 +1,6 @@
 <?php
 
-namespace Unit\Xemoe\Shells\Wrapper;
+namespace Unit\Shells;
 
 use \PHPUnit_Framework_TestCase as TestCase;
 use \Xemoe\ServicesContainer;

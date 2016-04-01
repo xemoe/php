@@ -1,6 +1,6 @@
 <?php
 
-namespace Unit\Xemoe\Wrappers;
+namespace Unit\Wrappers;
 
 use \PHPUnit_Framework_TestCase as TestCase;
 use \Xemoe\Wrappers\Wrapper;

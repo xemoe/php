@@ -6,6 +6,9 @@ use \Xemoe\Exceptions\UnresolvableException;
 
 trait ServicesTrait
 {
+    protected $accept;
+    protected $services;
+
     public function attachable(array $classes)
     {
         $this->accept = $classes;

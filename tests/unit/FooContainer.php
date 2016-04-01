@@ -1,13 +1,13 @@
 <?php
 
-namespace Xemoe;
+namespace Unit;
 
 use \Xemoe\Container\Traits\ServicesTrait;
 use \Xemoe\Container\Traits\SingletonTrait;
 use \Xemoe\Contracts\ResolvableContract;
 use \Xemoe\Contracts\ServicesContract;
 
-class ServicesContainer implements ServicesContract,ResolvableContract
+class FooContainer implements ServicesContract,ResolvableContract
 {
     use SingletonTrait,
         ServicesTrait;

@@ -1,0 +1,6 @@
+/vendor
+
+tests/_output/*
+.sonar
+.build
+cache.properties

@@ -38,11 +38,14 @@ abstract class AbstractShell implements ShellContract
 
         $parser = $this->parser;
 
-        if (is_callable($parser)) {
-            $result = $parser($out);
-        } else {
-            $result = $out;
+        //
+        // Return if empty parser
+        //
+        if (!is_callable($parser)) {
+            return $out;
         }
+
+        $result = $parser($out);
 
         if (is_array($result) && isset($result['result'])) {
 
@@ -55,7 +58,7 @@ abstract class AbstractShell implements ShellContract
             return $result['result'];
 
         } else {
-            throw new Exception('Shell getResult command failed');
+            throw new Exception('Shell getResult command failed, closure must return array contain "result" key');
         }
     }
 

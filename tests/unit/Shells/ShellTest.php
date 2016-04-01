@@ -117,6 +117,26 @@ class ShellTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
+    public function testGetResult_withStubWrapper_withDefaultClosure_shouldReturnExpectValue()
+    {
+        $expected = 'bar';
+
+        //
+        // Attach stub wrapper
+        // into ServicesContrainer
+        // with WrapperContract as alias
+        //
+        $wrapper = static::stubWrapper();
+        ServicesContainer::attach($wrapper, WrapperContract::class);
+
+        $template = ['foo'];
+
+        $shell = new Shell($template, []);
+        $result = $shell->getResult();
+
+        $this->assertEquals($expected, $result);
+    }
+
     public function testGetPaginate_withDefaultParameters_shouldReturnExpectedArray()
     {
         $page = 1;

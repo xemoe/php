@@ -3,9 +3,9 @@
 namespace Unit\Shells;
 
 use \PHPUnit_Framework_TestCase as TestCase;
+use \Unit\ConcreteShell as Shell;
+use \Unit\ConcreteWrapper as Wrapper;
 use \Xemoe\ServicesContainer;
-use \Xemoe\Shells\Shell;
-use \Xemoe\Wrappers\Wrapper;
 use \Xemoe\Contracts\WrapperContract;
 
 class ShellTest extends TestCase
@@ -104,7 +104,7 @@ class ShellTest extends TestCase
         // with WrapperContract as alias
         //
         $wrapper = static::stubWrapper();
-        ServicesContainer::attach($wrapper, WrapperContract::class);
+        ServicesContainer::attach($wrapper, Wrapper::class);
 
         $template = ['foo'];
         $closure = function($out) {
@@ -127,7 +127,7 @@ class ShellTest extends TestCase
         // with WrapperContract as alias
         //
         $wrapper = static::stubWrapper();
-        ServicesContainer::attach($wrapper, WrapperContract::class);
+        ServicesContainer::attach($wrapper, Wrapper::class);
 
         $template = ['foo'];
 

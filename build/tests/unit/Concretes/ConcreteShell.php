@@ -1,11 +1,11 @@
 <?php
 
-namespace Unit;
+namespace Unit\Concretes;
 
 use \Xemoe\Abstracts\AbstractShell;
 use \Xemoe\Contracts\WrapperContract;
 use \Xemoe\ServicesContainer;
-use \Unit\ConcreteWrapper;
+use \Unit\Concretes\ConcreteWrapper;
 
 class ConcreteShell extends AbstractShell
 {

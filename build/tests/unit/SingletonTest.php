@@ -3,9 +3,9 @@
 namespace Unit;
 
 use \PHPUnit_Framework_TestCase as TestCase;
-use \Unit\FooContainer;
-use \Unit\BarContainer;;
-use \Unit\ConcreteWrapper as Wrapper;
+use \Unit\Containers\FooContainer;
+use \Unit\Containers\BarContainer;;
+use \Unit\Concretes\ConcreteWrapper as Wrapper;
 use \Xemoe\Contracts\WrapperContract;
 
 class ShellTest extends TestCase

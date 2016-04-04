@@ -1,6 +1,6 @@
 <?php
 
-namespace Unit;
+namespace Unit\Containers;
 
 use \Xemoe\Container\Traits\ServicesTrait;
 use \Xemoe\Container\Traits\SingletonTrait;

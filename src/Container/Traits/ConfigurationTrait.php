@@ -4,9 +4,12 @@ namespace Xemoe\Container\Traits;
 
 trait ConfigurationTrait
 {
-    public function attachable(array $classes)
+    protected $accept;
+    protected $properties;
+
+    public function attachable(array $keys)
     {
-        $this->accept = $classes;
+        $this->accept = $keys;
     }
 
     public static function set($name, $value)

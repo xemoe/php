@@ -3,8 +3,8 @@
 namespace Unit\Shells;
 
 use \PHPUnit_Framework_TestCase as TestCase;
-use \Unit\ConcreteShell as Shell;
-use \Unit\ConcreteWrapper as Wrapper;
+use \Unit\Concretes\ConcreteShell as Shell;
+use \Unit\Concretes\ConcreteWrapper as Wrapper;
 use \Xemoe\ServicesContainer;
 use \Xemoe\Contracts\WrapperContract;
 

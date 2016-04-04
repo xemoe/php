@@ -3,7 +3,7 @@
 namespace Unit\Wrappers;
 
 use \PHPUnit_Framework_TestCase as TestCase;
-use \Unit\ConcreteWrapper as Wrapper;
+use \Unit\Concretes\ConcreteWrapper as Wrapper;
 
 class WrapperTest extends TestCase
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Unit;
+namespace Unit\Concretes;
 
 use \Xemoe\Abstracts\AbstractWrapper;
 

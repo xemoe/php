@@ -16,6 +16,11 @@ trait ServicesTrait
             throw new InvalidArgumentException;
         }
 
+        //
+        // Only static method
+        // use $i = static::getInstance()
+        // instead of $this
+        //
         $this->accept = $classes;
     }
 

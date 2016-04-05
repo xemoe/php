@@ -2,6 +2,9 @@
 
 namespace Xemoe\Container\Traits;
 
+use \Xemoe\Exceptions\InvalidArgumentException;
+use \Xemoe\Exceptions\UnresolvableException;
+
 trait ConfigurationTrait
 {
     protected $accept;
@@ -9,6 +12,10 @@ trait ConfigurationTrait
 
     public function attachable(array $keys)
     {
+        if (empty($keys)) {
+            throw new InvalidArgumentException;
+        }
+
         $this->accept = $keys;
     }
 
@@ -17,6 +24,8 @@ trait ConfigurationTrait
         $i = static::getInstance();
         if (in_array($name, $i->accept)) {
             $i->properties[$name] = $value;
+        } else {
+            throw new InvalidArgumentException;
         }
     }
 
@@ -25,6 +34,8 @@ trait ConfigurationTrait
         if (static::has($name)) {
             $i = static::getInstance();
             return $i->properties[$name];
+        } else {
+            throw new UnresolvableException;
         }
 
         return false;

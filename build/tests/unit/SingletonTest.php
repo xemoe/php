@@ -16,6 +16,11 @@ class ShellTest extends TestCase
         BarContainer::clean();
     }
 
+    //
+    // Create 2 different of stub wrapper class
+    // 1. fooWrapper return foo on exec(['foo'])
+    // 2. barWrapper return bar on exec(['foo'])
+    //
     protected function fooWrapper()
     {
         $stub = $this->getMockBuilder(WrapperContract::class)->getMock();
@@ -55,7 +60,7 @@ class ShellTest extends TestCase
         FooContainer::attach(static::fooWrapper(), WrapperContract::class);
         BarContainer::attach(static::barWrapper(), WrapperContract::class);
 
-        $this->assertEquals('foo', FooContainer::resolve(WrapperContract::class)->exec(['foo']));
-        $this->assertEquals('bar', BarContainer::resolve(WrapperContract::class)->exec(['foo']));
+        $this->assertEquals('foo', FooContainer::getInstance()->resolve(WrapperContract::class)->exec(['foo']));
+        $this->assertEquals('bar', BarContainer::getInstance()->resolve(WrapperContract::class)->exec(['foo']));
     }
 }

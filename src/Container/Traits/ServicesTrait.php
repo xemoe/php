@@ -2,6 +2,7 @@
 
 namespace Xemoe\Container\Traits;
 
+use \Xemoe\Exceptions\InvalidArgumentException;
 use \Xemoe\Exceptions\UnresolvableException;
 
 trait ServicesTrait
@@ -11,6 +12,10 @@ trait ServicesTrait
 
     public function attachable(array $classes)
     {
+        if (empty($classes)) {
+            throw new InvalidArgumentException;
+        }
+
         $this->accept = $classes;
     }
 
@@ -24,6 +29,8 @@ trait ServicesTrait
                 } else {
                     $i->services[get_class($object)] = $object;
                 }
+            } else {
+                throw new InvalidArgumentException;
             }
         }
     }

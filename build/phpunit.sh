@@ -10,7 +10,7 @@ SCRIPT_PATH=$(dirname $(realpath -s $0))
 PHPDBG=/usr/bin/phpdbg
 PHPUNIT=${SCRIPT_PATH}/vendor/bin/phpunit
 
-if php -v | grep "php 7" &>/dev/null
+if php -v | grep -i "php 7" &>/dev/null
 then
     ${PHPDBG} -qrr ${PHPUNIT} "$@"
 else

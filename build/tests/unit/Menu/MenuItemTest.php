@@ -11,6 +11,9 @@ class MenuItemTest extends TestCase
 {
     public function testCreateMenuItem_withMissingRequiredParameter_shouldThrowExpectedException()
     {
+        //
+        // @expected
+        //
         $expectedException = InvalidArgumentException::class;
         $this->setExpectedException($expectedException);
 
@@ -19,6 +22,9 @@ class MenuItemTest extends TestCase
 
     public function testCreateMenuItem_withInvalidActiveRule_shouldThrowExpectedException()
     {
+        //
+        // @expected
+        //
         $expectedException = InvalidArgumentException::class;
         $this->setExpectedException($expectedException);
 

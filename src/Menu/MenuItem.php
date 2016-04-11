@@ -86,7 +86,8 @@ class MenuItem implements MenuItemContract
     }
 
     public function isActive() {
-        return static::getActiveRule()($this);
+        $rule = static::getActiveRule();
+        return $rule($this);
     }
 
     public function setTemplate(StringTemplateContract $template) {}

@@ -3,7 +3,7 @@ var gulp = require('gulp'),
     exec = require('child_process').exec;
 
 gulp.task('phpunit', function() {
-    exec('clear && date && ./phpunit.sh', function(error, stdout) {
+    exec('clear && date && ./vendor/bin/codecept run', function(error, stdout) {
         sys.puts(stdout); 
     });
 }); 

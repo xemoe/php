@@ -26,7 +26,7 @@ class MenuItemTest extends TestCase
             'name' => 'home',
             'label' => 'Home',
             'link' => '/home',
-            'active' => false,
+            'rule' => false,
         ]);
     }
 
@@ -40,7 +40,7 @@ class MenuItemTest extends TestCase
             'name' => 'home',
             'label' => 'Home',
             'link' => '/home',
-            'active' => function(MenuItemContract $item) {
+            'rule' => function(MenuItemContract $item) {
                 return (bool) preg_match('#home$#', $item->getUri());
             },
         ]);
@@ -53,6 +53,27 @@ class MenuItemTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testIsActive_withEmptyUri_shouldReturnFalse()
+    {
+        //
+        // @conditions
+        //
+        $menu = new MenuItem([
+            'name' => 'home',
+            'label' => 'Home',
+            'link' => '/home',
+            'rule' => function(MenuItemContract $item) {
+                return (bool) preg_match('#home$#', $item->getUri());
+            },
+        ]);
+        $result = $menu->isActive();
+
+        //
+        // @asserts
+        //
+        $this->assertFalse($result);
+    }
+   
     public function testIsActive_withAnotherUri_shouldReturnFalse()
     {
         //
@@ -63,7 +84,7 @@ class MenuItemTest extends TestCase
             'name' => 'home',
             'label' => 'Home',
             'link' => '/home',
-            'active' => function(MenuItemContract $item) {
+            'rule' => function(MenuItemContract $item) {
                 return (bool) preg_match('#home$#', $item->getUri());
             },
         ]);
@@ -74,5 +95,71 @@ class MenuItemTest extends TestCase
         // @asserts
         //
         $this->assertFalse($result);
+    }
+   
+    public function testToArray_withActive_shouldReturnExpectedArray()
+    {
+        //
+        // @expected
+        //
+        $expected = [
+            'name' => 'home',
+            'label' => 'Home',
+            'link' => '/home',
+            'active' => true,
+        ];
+
+        //
+        // @conditions
+        //
+        $currentUri = 'http://localhost/home';
+        $menu = new MenuItem([
+            'name' => 'home',
+            'label' => 'Home',
+            'link' => '/home',
+            'rule' => function(MenuItemContract $item) {
+                return (bool) preg_match('#home$#', $item->getUri());
+            },
+        ]);
+        $menu->setUri($currentUri);
+        $result = $menu->toArray();
+
+        //
+        // @asserts
+        //
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testToArray_withInactive_shouldReturnExpectedArray()
+    {
+        //
+        // @expected
+        //
+        $expected = [
+            'name' => 'home',
+            'label' => 'Home',
+            'link' => '/home',
+            'active' => false,
+        ];
+
+        //
+        // @conditions
+        //
+        $currentUri = 'http://localhost/another';
+        $menu = new MenuItem([
+            'name' => 'home',
+            'label' => 'Home',
+            'link' => '/home',
+            'rule' => function(MenuItemContract $item) {
+                return (bool) preg_match('#home$#', $item->getUri());
+            },
+        ]);
+        $menu->setUri($currentUri);
+        $result = $menu->toArray();
+
+        //
+        // @asserts
+        //
+        $this->assertEquals($expected, $result);
     }
 }

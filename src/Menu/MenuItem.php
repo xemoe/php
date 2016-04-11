@@ -8,52 +8,73 @@ use \Xemoe\Menu\Contracts\MenuItemContract;
 
 class MenuItem implements MenuItemContract
 {
+    const ATTR_NAME = 'name';
+    const ATTR_LABEL = 'label';
+    const ATTR_LINK = 'link';
+    const ATTR_RULE = 'rule';
+    const ATTR_ACTIVE = 'active';
+
     protected $attributes;
     protected $currentUri;
-    protected $required = [
-        'name',
-        'label',
-        'link',
-        'active',
-    ];
+    protected $required;
 
     public function __construct(array $properties)
     {
+        static::setRequired();
         if (static::validate($properties)) {
             $this->attributes = $properties;
         }
     }
 
+    protected function setRequired()
+    {
+        $this->required = [
+            static::ATTR_NAME,
+            static::ATTR_LABEL,
+            static::ATTR_LINK,
+            static::ATTR_RULE,
+        ];
+        sort($this->required);
+    }
+
     protected function validate(array $properties)
     {
-        sort($this->required);
         ksort($properties);
 
         if (array_keys($properties) != $this->required) {
             throw new InvalidArgumentException(sprintf('Constructor required array contains keys'));
         }
 
-        if (!is_callable($properties['active'])) {
-            throw new InvalidArgumentException(sprintf('Active construct parameter should be callable function'));
+        if (!is_callable($properties[static::ATTR_RULE])) {
+            throw new InvalidArgumentException(sprintf('Rule construct parameter should be callable function'));
         }
 
         return true;
     }
 
     public function getName() {
-        return $this->attributes['name'];
+        return $this->attributes[static::ATTR_NAME];
     }
 
     public function getLabel() {
-        return $this->attributes['label'];
+        return $this->attributes[static::ATTR_LABEL];
     }
 
     public function getLink() {
-        return $this->attributes['link'];
+        return $this->attributes[static::ATTR_LINK];
+    }
+
+    public function setActiveRule($callable)
+    {
+        if (!is_callable($callable)) {
+            throw new InvalidArgumentException(sprintf('Rule parameter should be callable function'));
+        }
+        
+        $this->attributes[static::ATTR_RULE] = $callable;
     }
 
     public function getActiveRule() {
-        return $this->attributes['active'];
+        return $this->attributes[static::ATTR_RULE];
     }
 
     public function setUri($uri) {
@@ -65,9 +86,20 @@ class MenuItem implements MenuItemContract
     }
 
     public function isActive() {
-        return $this->attributes['active']($this);
+        return static::getActiveRule()($this);
     }
 
     public function setTemplate(StringTemplateContract $template) {}
     public function getTemplate() {}
+
+    public function toArray()
+    {
+        $ret = array_intersect_key(
+            $this->attributes, 
+            array_flip([static::ATTR_NAME, static::ATTR_LABEL, static::ATTR_LINK])
+        );
+        $ret[static::ATTR_ACTIVE] = static::isActive();
+
+        return $ret;
+    }
 }

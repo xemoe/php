@@ -26,17 +26,23 @@ trait ServicesTrait
 
     public static function attach($object, $alias = null)
     {
+        $attachable = false;
         $i = static::getInstance();
         foreach ($i->accept as $contracts) {
             if (in_array($contracts, class_implements($object))) {
+
                 if (!is_null($alias)) {
                     $i->services[$alias] = $object;
                 } else {
                     $i->services[get_class($object)] = $object;
                 }
-            } else {
-                throw new InvalidArgumentException;
+
+                $attachable = true;
             }
+        }
+
+        if (!$attachable) {
+            throw new InvalidArgumentException;
         }
     }
 

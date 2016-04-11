@@ -13,4 +13,8 @@ class ConfigurationContainer implements ConfigurationContract, EnvLoaderContract
     use ConfigurationTrait,
         EnvLoaderTrait,
         SingletonTrait;
+
+    protected function __construct()
+    {
+    }
 }

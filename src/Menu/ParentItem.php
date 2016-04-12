@@ -16,7 +16,6 @@ class ParentItem extends MenuItem implements ParentItemContract
     public function __construct(array $properties)
     {
         parent::__construct($properties);
-        static::setActiveRule(static::parentActiveRule());
         $this->child = [];
     }
 
@@ -57,14 +56,15 @@ class ParentItem extends MenuItem implements ParentItemContract
             array_flip([static::ATTR_NAME, static::ATTR_LABEL, static::ATTR_LINK])
         );
 
-        $parent[static::ATTR_ACTIVE] = static::isActive();
-
         if (sizeof(static::getChild()) > 0) {
+            $parent[static::ATTR_ACTIVE] = static::hasActiveChild();
             $parent[static::ATTR_CHILD] = [];
             foreach (static::getChild() as $child) {
                 $child->setUri(static::getUri());
                 $parent[static::ATTR_CHILD][$child->getName()] = $child->toArray();
             }
+        } else {
+            $parent[static::ATTR_ACTIVE] = static::isActive();
         }
 
         $ret = [
@@ -83,7 +83,8 @@ class ParentItem extends MenuItem implements ParentItemContract
     }
 
     public function hasActiveChild() {
-        return static::isActive();
+        $rule = static::parentActiveRule();
+        return $rule($this);
     }
 
     protected function parentActiveRule()
@@ -92,10 +93,12 @@ class ParentItem extends MenuItem implements ParentItemContract
 
         return function(ParentItemContract $parent) use ($uri) {
 
-            $active = true;
+            $active = false;
             foreach ($parent->getChild() as $child) {
                 $child->setUri($uri);
-                $active &= $child->isActive();
+                if ($child->isActive()) {
+                    $active = true;
+                }
             }
 
             return (bool) $active;

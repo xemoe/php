@@ -30,7 +30,9 @@ trait ConfigurationTrait
         if (in_array($name, $i->accept)) {
             $i->properties[$name] = $value;
         } else {
-            throw new InvalidArgumentException;
+            throw new InvalidArgumentException(
+                sprintf('Configuration set %s => %s is invalid in %s', $name, $value, __METHOD__)
+            );
         }
     }
 
@@ -40,7 +42,9 @@ trait ConfigurationTrait
             $i = static::getInstance();
             return $i->properties[$name];
         } else {
-            throw new UnresolvableException;
+            throw new UnresolvableException(
+                sprintf('Configuration key %s not found in %s', $name, __METHOD__)
+            );
         }
 
         return false;

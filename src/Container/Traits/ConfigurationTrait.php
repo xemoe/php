@@ -43,7 +43,7 @@ trait ConfigurationTrait
             return $i->properties[$name];
         } else {
             throw new UnresolvableException(
-                sprintf('Configuration key %s not found in %s', $name, __METHOD__)
+                sprintf('Configuration key %s not found in %s::%s', $name, __CLASS__, __FUNCTION__)
             );
         }
 

@@ -13,15 +13,4 @@ interface ShellObserverContract
     public function beforeGetPaginate(ShellContract $w);
     public function afterGetPaginate(ShellContract $w);
     public function onErrorGetPaginate(ShellContract $w);
-    /**
-    public function beforeExec($w);
-    public function afterExec($w);
-    public function onErrorExec($w);
-    public function beforeGetResult($w);
-    public function afterGetResult($w, $out);
-    public function onErrorGetResult($w);
-    public function beforeGetPaginate($w);
-    public function afterGetPaginate($w);
-    public function onErrorGetPaginate($w);
-    **/
 }

@@ -60,7 +60,6 @@ class ShellHistoryObserverTest extends TestCase
             $shell2->toString(),
         ];
 
-        $shell1 = static::shell();
         $shell1->exec();
         $shell2->exec();
 
@@ -114,7 +113,6 @@ class ShellHistoryObserverTest extends TestCase
         //
         $expected = 2;
 
-        $shell1 = static::shell();
         $shell1->exec();
         $shell2->exec();
 

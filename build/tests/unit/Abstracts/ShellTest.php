@@ -1,12 +1,13 @@
 <?php
 
-namespace Unit\Shells;
+namespace Unit\Abstracts;
 
-use \PHPUnit_Framework_TestCase as TestCase;
-use \Unit\Concretes\ConcreteShell as Shell;
-use \Unit\Concretes\ConcreteWrapper as Wrapper;
-use \Xemoe\ServicesContainer;
-use \Xemoe\Contracts\WrapperContract;
+use PHPUnit_Framework_TestCase as TestCase;
+use Xemoe\Contracts\WrapperContract;
+use Xemoe\Exceptions\ShellErrorException;
+use Xemoe\ServicesContainer;
+use Unit\Concretes\ConcreteShell as Shell;
+use Unit\Concretes\ConcreteWrapper as Wrapper;
 
 class ShellTest extends TestCase
 {
@@ -17,40 +18,12 @@ class ShellTest extends TestCase
 
     protected function shell()
     {
-        //
-        // Command template
-        //
-        $template = ['echo "%s\n%s\n%s\n%s\n%s"', 'one,two,three,four,five'];
-
-        //
-        // Command parameters
-        //
-        $param = ['one' => 1, 'two' => 2, 'three' => 3, 'four' => 4, 'five' => 5];
-
-        //
-        // Anonymous output function
-        //
-        $closure = function($out) {
-
-            $arr = explode(PHP_EOL, $out);
-            $arr = array_filter($arr);
-
-            return ['result' => $arr];
-        };
-
-        //
-        // Anonymous convert result row function
-        //
-        $convert = function(&$item) {
-            $item = (int) $item + 1;
-        };
-
-        return new Shell($template, $param, $closure, $convert);
+        return Helper::shell();
     }
 
     protected function wrapper()
     {
-        return new Wrapper;
+        return Helper::wrapper();
     }
 
     protected function stubWrapper()
@@ -72,6 +45,9 @@ class ShellTest extends TestCase
 
     public function testStubWrapperExec_withFoo_shouldReturnExpectValue()
     {
+        //
+        // @expected
+        //
         $expected= 'bar';
 
         $wrapper = static::stubWrapper();
@@ -82,13 +58,21 @@ class ShellTest extends TestCase
 
     public function testCreateWrapperShell_shouldReturnObject()
     {
+        //
+        // @expected
+        //
+        $expected = 'object';
+
         $shell = new Shell([], [], false);
 
-        $this->assertInternalType('object', $shell);
+        $this->assertInternalType($expected, $shell);
     }
 
     public function testGetResult_shouldReturnExpectedArray()
     {
+        //
+        // @expected
+        //
         $expected = [2,3,4,5,6];
 
         $this->assertEquals($expected, static::shell()->getResult());
@@ -96,6 +80,9 @@ class ShellTest extends TestCase
 
     public function testGetResult_withStubWrapper_shouldReturnExpectValue()
     {
+        //
+        // @expected
+        //
         $expected = 'foo => bar';
 
         //
@@ -119,6 +106,9 @@ class ShellTest extends TestCase
 
     public function testGetResult_withStubWrapper_withDefaultClosure_shouldReturnExpectValue()
     {
+        //
+        // @expected
+        //
         $expected = 'bar';
 
         //
@@ -143,6 +133,9 @@ class ShellTest extends TestCase
         $perpage = 10;
         $total = 5;
 
+        //
+        // @expected
+        //
         $expected = [
             'items' => [2,3,4,5,6],
             'paging' => static::wrapper()->paginate($total, $page, $perpage),
@@ -157,6 +150,9 @@ class ShellTest extends TestCase
         $perpage = 3;
         $total = 5;
 
+        //
+        // @expected
+        //
         $expected = [
             'items' => [4,5,6],
             'paging' => static::wrapper()->paginate($total, $page, $perpage),
@@ -171,6 +167,9 @@ class ShellTest extends TestCase
         $perpage = 3;
         $total = 5;
 
+        //
+        // @expected
+        //
         $expected = [
             'items' => [2,3],
             'paging' => static::wrapper()->paginate($total, $page, $perpage),
@@ -181,8 +180,48 @@ class ShellTest extends TestCase
 
     public function testToString_shouldReturnExpectedValue()
     {
-        $expected = sprintf('echo "1\n2\n3\n4\n5"');
+        //
+        // @expected
+        //
+        $expected = 'echo "1\n2\n3\n4\n5"';
 
         $this->assertEquals($expected, static::shell()->toString());
+    }
+
+    public function testGetError_onHasError_shouldReturnExpectedValue()
+    {
+        //
+        // @expected
+        //
+        $expectedException = ShellErrorException::class;
+        $expectedError = 'ls: cannot access /foo: No such file or directory';
+
+        $this->setExpectedException($expectedException);
+
+        $template = ['ls %s', 'dir'];
+        $param = ['dir' => '/foo'];
+        $shell = new Shell($template, $param);
+
+        $out = $shell->getResult();
+        $error = trim($shell->getError());
+
+        $this->assertEquals($expectedError, $error);
+    }
+
+    public function testGetError_onEmptyError_shouldReturnExpectedValue()
+    {
+        //
+        // @expected
+        //
+        $expectedError = '';
+
+        $template = ['ls %s', 'dir'];
+        $param = ['dir' => '/tmp'];
+        $shell = new Shell($template, $param);
+
+        $out = $shell->getResult();
+        $error = trim($shell->getError());
+
+        $this->assertEquals($expectedError, $error);
     }
 }

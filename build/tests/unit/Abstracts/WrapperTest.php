@@ -1,9 +1,10 @@
 <?php
 
-namespace Unit\Wrappers;
+namespace Unit\Abstracts;
 
-use \PHPUnit_Framework_TestCase as TestCase;
-use \Unit\Concretes\ConcreteWrapper as Wrapper;
+use PHPUnit_Framework_TestCase as TestCase;
+use Unit\Concretes\ConcreteWrapper as Wrapper;
+use Xemoe\Exceptions\ShellErrorException;
 
 class WrapperTest extends TestCase
 {
@@ -92,7 +93,7 @@ class WrapperTest extends TestCase
         $this->assertEquals($expected, $wrapper->paginate($total, $page, $perpage));
     }
 
-    public function testWrapperPaginate_withPAge5_shouldReturnExpectedArray()
+    public function testWrapperPaginate_withPage5_shouldReturnExpectedArray()
     {
         $expected = [
             'total' => 23,
@@ -111,5 +112,25 @@ class WrapperTest extends TestCase
         $wrapper = new Wrapper;
 
         $this->assertEquals($expected, $wrapper->paginate($total, $page, $perpage));
+    }
+
+    public function testWrapperExec_withError_shouldReturnExpectedValue()
+    {
+        //
+        // @expected
+        //
+        $expectedException = ShellErrorException::class;
+        $expectedError = 'ls: cannot access /foo: No such file or directory';
+
+        $this->setExpectedException($expectedException);
+
+        $wrapper = new Wrapper;
+
+        $template = ['ls %s', 'dir'];
+        $param = ['dir' => '/foo'];
+        $wrapper->exec($template, $param);
+        $error = trim($wrapper->getError());
+
+        $this->assertEquals($expectedError, $error);
     }
 }

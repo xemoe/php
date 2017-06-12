@@ -16,6 +16,7 @@ class ServicesContainer implements ServicesContract,ResolvableContract
     {
         static::attachable([
             \Xemoe\Contracts\WrapperContract::class,
+            \Xemoe\Contracts\ShellObserverContract::class,
         ]);
     }
 }

@@ -2,8 +2,9 @@
 
 namespace Xemoe\Abstracts;
 
-use \Xemoe\Contracts\ShellContract;
-use \Exception;
+use Xemoe\Contracts\ShellContract;
+use Xemoe\Exceptions\ShellErrorException;
+use Exception;
 
 abstract class AbstractShell implements ShellContract 
 {
@@ -11,6 +12,8 @@ abstract class AbstractShell implements ShellContract
     protected $args;
     protected $parser;
     protected $convert;
+    protected $observer;
+    protected $wrapper;
 
     public function __construct(array $template, array $args, $parser = false, $convert = false)
     {
@@ -21,6 +24,8 @@ abstract class AbstractShell implements ShellContract
     }
 
     abstract protected function getWrapper();
+    abstract public function getError();
+    abstract public function getObserverInstances();
 
     public function toString()
     {
@@ -29,19 +34,69 @@ abstract class AbstractShell implements ShellContract
 
     public function exec()
     {
-        static::getWrapper()->exec($this->template, $this->args);
+        $observers = $this->getObserverInstances();
+        $wrapper = static::getWrapper();
+
+        //
+        // Before exec
+        //
+        foreach ($observers as $observer) {
+            if (is_callable([$observer, 'beforeExec'])) {
+                $observer->beforeExec($this);
+            }
+        }
+
+        try {
+            static::getWrapper()->exec($this->template, $this->args);
+        } catch (ShellErrorException $e) {
+            foreach ($observers as $observer) {
+                if (is_callable([$observer, 'onErrorExec'])) {
+                    $observer->onErrorExec($this);
+                }
+            }
+            throw $e;
+        }
+
+        //
+        // After exec
+        //
+        foreach ($observers as $observer) {
+            if (is_callable([$observer, 'afterExec'])) {
+                $observer->afterExec($this);
+            }
+        }
     }
 
     public function getResult()
     {
-        $out = static::getWrapper()->exec($this->template, $this->args);
+        $observers = $this->getObserverInstances();
 
+        //
+        // Before getResult
+        //
+        foreach ($observers as $observer) {
+            if (is_callable([$observer, 'beforeGetResult'])) {
+                $observer->beforeGetResult($this);
+            }
+        }
+
+        $out = static::getWrapper()->exec($this->template, $this->args);
         $parser = $this->parser;
 
         //
         // Return if empty parser
         //
         if (!is_callable($parser)) {
+
+            //
+            // After getResult #1
+            //
+            foreach ($observers as $observer) {
+                if (is_callable([$observer, 'afterGetResult'])) {
+                    $observer->afterGetResult($this, $out);
+                }
+            }
+
             return $out;
         }
 
@@ -52,10 +107,21 @@ abstract class AbstractShell implements ShellContract
             $convert = $this->convert;
 
             if (is_callable($convert)) {
-                $result['result'] = static::doConvert($result['result'], $convert);
+                $return = static::doConvert($result['result'], $convert);
+            } else {
+                $return = $result['result'];
             }
 
-            return $result['result'];
+            //
+            // After getResult #2
+            //
+            foreach ($observers as $observer) {
+                if (is_callable([$observer, 'afterGetResult'])) {
+                    $observer->afterGetResult($this, $return);
+                }
+            }
+
+            return $return;
 
         } else {
             throw new Exception('Shell getResult command failed, closure must return array contain "result" key');

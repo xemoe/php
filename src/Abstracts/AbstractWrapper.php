@@ -2,11 +2,14 @@
 
 namespace Xemoe\Abstracts;
 
-use \Xemoe\Contracts\WrapperContract;
-use \Exception;
+use Xemoe\Contracts\WrapperContract;
+use Xemoe\Exceptions\ShellErrorException;
+use Exception;
 
 abstract class AbstractWrapper implements WrapperContract
 {
+    abstract public function getError();
+
     public function paging($paginator)
     {
         $from = ($paginator->currentPage() - 1) * $paginator->perPage() + 1;
@@ -44,10 +47,33 @@ abstract class AbstractWrapper implements WrapperContract
 
     public function exec(array $template, array $vars = [])
     {
+        $descriptor = [
+            1 => ['pipe','w'],
+            2 => ['pipe','w'],
+        ];
         $cmd = static::variables_template($template, $vars);
-        $output = shell_exec($cmd);
 
-        return $output;
+        $process = proc_open($cmd, $descriptor, $pipes);
+
+        //
+        // stdout
+        //
+        $this->out = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+
+        //
+        // stderr
+        //
+        $this->error = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+
+        proc_close($process);
+
+        if ($this->error != "") {
+            throw new ShellErrorException;
+        }
+
+        return $this->out;
     }
 
     public function variables_template(array $template, array $vars = [])

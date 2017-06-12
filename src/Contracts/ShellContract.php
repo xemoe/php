@@ -9,4 +9,5 @@ interface ShellContract
     public function exec();
     public function getResult();
     public function getPaginate($page = 1, $perpage = 10, $total = false);
+    public function getError();
 }

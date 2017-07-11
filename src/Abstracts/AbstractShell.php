@@ -49,9 +49,13 @@ abstract class AbstractShell implements ShellContract
         try {
             $wrapper->exec($this->template, $this->args);
         } catch (ShellErrorException $e) {
+
+            $bt = debug_backtrace();
+            $caller = array_shift($bt);
+
             foreach ($observers as $observer) {
                 if (is_callable([$observer, 'onErrorExec'])) {
-                    $observer->onErrorExec($this);
+                    $observer->onErrorExec($this, $caller);
                 }
             }
             throw $e;
@@ -84,9 +88,13 @@ abstract class AbstractShell implements ShellContract
         try {
             $out = $wrapper->exec($this->template, $this->args);
         } catch (ShellErrorException $e) {
+
+            $bt = debug_backtrace();
+            $caller = array_shift($bt);
+
             foreach ($observers as $observer) {
                 if (is_callable([$observer, 'onErrorGetResult'])) {
-                    $observer->onErrorGetResult($this);
+                    $observer->onErrorGetResult($this, $caller);
                 }
             }
             throw $e;

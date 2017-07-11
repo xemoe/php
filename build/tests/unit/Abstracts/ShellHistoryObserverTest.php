@@ -77,14 +77,16 @@ class ShellHistoryObserverTest extends TestCase
         //
         // @expected
         //
-        $expected = [
-            'ls: cannot access /foo: No such file or directory',
-        ];
+        $expected = [[
+            'error' => 'ls: cannot access /foo: No such file or directory',
+            'file' => __FILE__,
+        ]];
 
         try {
             $template = ['ls %s', 'dir'];
             $param = ['dir' => '/foo'];
             $shell = new Shell($template, $param);
+            $expected[0]['line'] = __LINE__ + 1;
             $shell->exec();
         } catch (ShellErrorException $e) {
             $observer = static::observer();
@@ -184,14 +186,16 @@ class ShellHistoryObserverTest extends TestCase
         //
         // @expected
         //
-        $expected = [
-            'ls: cannot access /foo: No such file or directory',
-        ];
+        $expected = [[
+            'error' => 'ls: cannot access /foo: No such file or directory',
+            'file' => __FILE__,
+        ]];
 
         try {
             $template = ['ls %s', 'dir'];
             $param = ['dir' => '/foo'];
             $shell = new Shell($template, $param);
+            $expected[0]['line'] = __LINE__ + 1;
             $shell->getResult();
         } catch (ShellErrorException $e) {
             $observer = static::observer();

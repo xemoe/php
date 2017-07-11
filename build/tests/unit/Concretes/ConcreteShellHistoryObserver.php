@@ -30,11 +30,14 @@ class ConcreteShellHistoryObserver implements ShellObserverContract
         $this->execCounter += 1;
     }
 
-    public function onErrorExec(ShellContract $shell)
+    public function onErrorExec(ShellContract $shell, $caller)
     {
         array_push(
-            $this->execErrorHistory, 
-            trim($shell->getError())
+            $this->execErrorHistory, [
+                'error' => trim($shell->getError()),
+                'line' => $caller['line'],
+                'file' => $caller['file'],
+            ]
         );
     }
 
@@ -51,11 +54,14 @@ class ConcreteShellHistoryObserver implements ShellObserverContract
         $this->resultCounter += 1;
     }
 
-    public function onErrorGetResult(ShellContract $shell)
+    public function onErrorGetResult(ShellContract $shell, $caller)
     {
         array_push(
-            $this->resultErrorHistory, 
-            trim($shell->getError())
+            $this->resultErrorHistory, [
+                'error' => trim($shell->getError()),
+                'line' => $caller['line'],
+                'file' => $caller['file'],
+            ]
         );
     }
 
@@ -67,7 +73,7 @@ class ConcreteShellHistoryObserver implements ShellObserverContract
     {
     }
 
-    public function onErrorGetPaginate(ShellContract $shell)
+    public function onErrorGetPaginate(ShellContract $shell, $caller)
     {
     }
 

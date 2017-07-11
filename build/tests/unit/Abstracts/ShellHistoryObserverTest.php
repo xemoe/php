@@ -96,7 +96,8 @@ class ShellHistoryObserverTest extends TestCase
             $errors = $observer->getExecErrorHistory();
         }
 
-        $this->assertEquals($expected, $errors);
+        $this->assertEquals($expected[0]['file'], $errors[0]['file']);
+        $this->assertEquals($expected[0]['line'], $errors[0]['line']);
     }
 
     public function testGetExecCounter_shouldReturnExpectedValue()
@@ -211,7 +212,8 @@ class ShellHistoryObserverTest extends TestCase
             $errors = $observer->getResultErrorHistory();
         }
 
-        $this->assertEquals($expected, $errors);
+        $this->assertEquals($expected[0]['file'], $errors[0]['file']);
+        $this->assertEquals($expected[0]['line'], $errors[0]['line']);
     }
 
     public function testGetResultCounter_shouldReturnExpectedValue()
@@ -317,7 +319,8 @@ class ShellHistoryObserverTest extends TestCase
             $errors = $observer->getPaginateErrorHistory();
         }
 
-        $this->assertEquals($expected, $errors);
+        $this->assertEquals($expected[0]['file'], $errors[0]['file']);
+        $this->assertEquals($expected[0]['line'], $errors[0]['line']);
     }
 
     public function testGetPaginateCounter_shouldReturnExpectedValue()

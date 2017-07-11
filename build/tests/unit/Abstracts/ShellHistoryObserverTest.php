@@ -83,6 +83,9 @@ class ShellHistoryObserverTest extends TestCase
         ]];
 
         try {
+            //
+            // use `ls` command on not existing directory
+            //
             $template = ['ls %s', 'dir'];
             $param = ['dir' => '/foo'];
             $shell = new Shell($template, $param);
@@ -135,6 +138,9 @@ class ShellHistoryObserverTest extends TestCase
         $expected = 0;
 
         try {
+            //
+            // use `ls` command on not existing directory
+            //
             $template = ['ls %s', 'dir'];
             $param = ['dir' => '/foo'];
             $shell = new Shell($template, $param);
@@ -192,6 +198,9 @@ class ShellHistoryObserverTest extends TestCase
         ]];
 
         try {
+            //
+            // use `ls` command on not existing directory
+            //
             $template = ['ls %s', 'dir'];
             $param = ['dir' => '/foo'];
             $shell = new Shell($template, $param);
@@ -244,6 +253,9 @@ class ShellHistoryObserverTest extends TestCase
         $expected = 0;
 
         try {
+            //
+            // use `ls` command on not existing directory
+            //
             $template = ['ls %s', 'dir'];
             $param = ['dir' => '/foo'];
             $shell = new Shell($template, $param);
@@ -251,6 +263,105 @@ class ShellHistoryObserverTest extends TestCase
         } catch (ShellErrorException $e) {
             $observer = static::observer();
             $counter = $observer->getResultCounter();
+        }
+
+        $this->assertEquals($expected, $counter);
+    }
+
+    public function testGetPaginateCommandHistory_shouldReturnExpectedArray()
+    {
+        //
+        // shell #1
+        //
+        $shell1 = static::shell();
+
+        //
+        // @expected
+        //
+        $expected = [
+            $shell1->toString(),
+        ];
+
+        $shell1->getPaginate();
+
+        //
+        // get exec history from both shell#1 and shell#2
+        //
+        $observer = static::observer();
+        $history = $observer->getPaginateCommandHistory();
+
+        $this->assertEquals($expected, $history);
+    }
+
+    public function testGetPaginateErrorHistory_onHasError_shouldReturnExpectedValue()
+    {
+        //
+        // @expected
+        //
+        $expected = [[
+            'error' => 'ls: cannot access /foo: No such file or directory',
+            'file' => __FILE__,
+        ]];
+
+        try {
+            //
+            // use `ls` command on not existing directory
+            //
+            $template = ['ls %s', 'dir'];
+            $param = ['dir' => '/foo'];
+            $shell = new Shell($template, $param);
+            $expected[0]['line'] = __LINE__ + 1;
+            $shell->getPaginate();
+        } catch (ShellErrorException $e) {
+            $observer = static::observer();
+            $errors = $observer->getPaginateErrorHistory();
+        }
+
+        $this->assertEquals($expected, $errors);
+    }
+
+    public function testGetPaginateCounter_shouldReturnExpectedValue()
+    {
+        //
+        // shell #1
+        //
+        $shell1 = static::shell();
+
+        //
+        // @expected
+        //
+        $expected = 2;
+
+        $shell1->getPaginate(1);
+        $shell1->getPaginate(2);
+
+        //
+        // get exec history from both shell#1 and shell#2
+        //
+        $observer = static::observer();
+        $counter = $observer->getPaginateCounter();
+
+        $this->assertEquals($expected, $counter);
+    }
+
+    public function testGetPaginateCounter_onError_shouldReturnExpectedValue()
+    {
+        //
+        // @expected
+        //
+        $expected = 0;
+
+        try {
+            //
+            // use `ls` command on not existing directory
+            //
+            $template = ['ls %s', 'dir'];
+            $param = ['dir' => '/foo'];
+            $shell = new Shell($template, $param);
+            $shell->getPaginate();
+        } catch (ShellErrorException $e) {
+            $observer = static::observer();
+            $counter = $observer->getPaginateCounter();
         }
 
         $this->assertEquals($expected, $counter);

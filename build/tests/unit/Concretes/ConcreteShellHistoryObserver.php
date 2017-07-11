@@ -13,6 +13,9 @@ class ConcreteShellHistoryObserver implements ShellObserverContract
     protected $resultCommandHistory = [];
     protected $resultErrorHistory = [];
     protected $resultCounter = 0;
+    protected $paginateCommandHistory = [];
+    protected $paginateErrorHistory = [];
+    protected $paginateCounter = 0;
 
     //
     // Implements required
@@ -67,18 +70,31 @@ class ConcreteShellHistoryObserver implements ShellObserverContract
 
     public function beforeGetPaginate(ShellContract $shell)
     {
+        array_push(
+            $this->paginateCommandHistory, 
+            trim($shell->toString())
+        );
     }
 
     public function afterGetPaginate(ShellContract $shell)
     {
+        $this->paginateCounter += 1;
     }
 
     public function onErrorGetPaginate(ShellContract $shell, $caller)
     {
+        array_push(
+            $this->paginateErrorHistory, [
+                'error' => trim($shell->getError()),
+                'line' => $caller['line'],
+                'file' => $caller['file'],
+            ]
+        );
     }
 
     //
     // New implements
+    //
     //
     // from exec() command
     //
@@ -113,5 +129,23 @@ class ConcreteShellHistoryObserver implements ShellObserverContract
     public function getResultCounter()
     {
         return $this->resultCounter;
+    }
+
+    //
+    // from getPaginate() command
+    //
+    public function getPaginateCommandHistory()
+    {
+        return $this->paginateCommandHistory;
+    }
+
+    public function getPaginateErrorHistory()
+    {
+        return $this->paginateErrorHistory;
+    }
+
+    public function getPaginateCounter()
+    {
+        return $this->paginateCounter;
     }
 }

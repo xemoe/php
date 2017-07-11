@@ -152,6 +152,16 @@ abstract class AbstractShell implements ShellContract
         $ret = [];
 
         $wrapper = static::getWrapper();
+        $observers = $this->getObserverInstances();
+
+        //
+        // Before getPaginate
+        //
+        foreach ($observers as $observer) {
+            if (is_callable([$observer, 'beforeGetPaginate'])) {
+                $observer->beforeGetPaginate($this);
+            }
+        }
 
         //
         // Modify template command
@@ -160,7 +170,22 @@ abstract class AbstractShell implements ShellContract
         if (!is_numeric($total)) {
             $template = $this->template;
             $template[0] = sprintf('%s | wc -l ', $template[0]);
-            $out = $wrapper->exec($template, $this->args);
+
+            try {
+                $out = $wrapper->exec($template, $this->args);
+            } catch (ShellErrorException $e) {
+
+                $bt = debug_backtrace();
+                $caller = array_shift($bt);
+
+                foreach ($observers as $observer) {
+                    if (is_callable([$observer, 'onErrorGetPaginate'])) {
+                        $observer->onErrorGetPaginate($this, $caller);
+                    }
+                }
+                throw $e;
+            }
+
             $out = trim($out);
             if (is_numeric($out)) {
                 $total = $out;
@@ -182,7 +207,21 @@ abstract class AbstractShell implements ShellContract
         $appendCommand = sprintf(' | tail -n %d | head -n %d ', $tail, $head);
         $template = $this->template;
         $template[0] = sprintf('%s %s', $template[0], $appendCommand);
-        $out = $wrapper->exec($template, $this->args);
+
+        try {
+            $out = $wrapper->exec($template, $this->args);
+        } catch (ShellErrorException $e) {
+
+            $bt = debug_backtrace();
+            $caller = array_shift($bt);
+
+            foreach ($observers as $observer) {
+                if (is_callable([$observer, 'onErrorGetPaginate'])) {
+                    $observer->onErrorGetPaginate($this, $caller);
+                }
+            }
+            throw $e;
+        }
 
         $parser = $this->parser;
 
@@ -202,6 +241,15 @@ abstract class AbstractShell implements ShellContract
 
             $ret['items'] = $result['result'];
             $ret['paging'] = $paginate;
+
+            //
+            // After getResult #1
+            //
+            foreach ($observers as $observer) {
+                if (is_callable([$observer, 'afterGetPaginate'])) {
+                    $observer->afterGetPaginate($this, $ret);
+                }
+            }
 
             return $ret;
 

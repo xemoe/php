@@ -47,7 +47,7 @@ abstract class AbstractShell implements ShellContract
         }
 
         try {
-            static::getWrapper()->exec($this->template, $this->args);
+            $wrapper->exec($this->template, $this->args);
         } catch (ShellErrorException $e) {
             foreach ($observers as $observer) {
                 if (is_callable([$observer, 'onErrorExec'])) {
@@ -70,6 +70,7 @@ abstract class AbstractShell implements ShellContract
     public function getResult()
     {
         $observers = $this->getObserverInstances();
+        $wrapper = static::getWrapper();
 
         //
         // Before getResult
@@ -80,7 +81,17 @@ abstract class AbstractShell implements ShellContract
             }
         }
 
-        $out = static::getWrapper()->exec($this->template, $this->args);
+        try {
+            $out = $wrapper->exec($this->template, $this->args);
+        } catch (ShellErrorException $e) {
+            foreach ($observers as $observer) {
+                if (is_callable([$observer, 'onErrorGetResult'])) {
+                    $observer->onErrorGetResult($this);
+                }
+            }
+            throw $e;
+        }
+
         $parser = $this->parser;
 
         //

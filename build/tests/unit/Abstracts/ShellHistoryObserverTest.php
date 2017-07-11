@@ -144,4 +144,111 @@ class ShellHistoryObserverTest extends TestCase
 
         $this->assertEquals($expected, $counter);
     }
+
+    public function testGetResultCommandHistory_shouldReturnExpectedArray()
+    {
+        //
+        // shell #1
+        //
+        $shell1 = static::shell();
+
+        //
+        // shell #2
+        //
+        $template = ['ls %s', 'dir'];
+        $param = ['dir' => '/tmp'];
+        $shell2 = new Shell($template, $param);
+
+        //
+        // @expected
+        //
+        $expected = [
+            $shell1->toString(),
+            $shell2->toString(),
+        ];
+
+        $shell1->getResult();
+        $shell2->getResult();
+
+        //
+        // get exec history from both shell#1 and shell#2
+        //
+        $observer = static::observer();
+        $history = $observer->getResultCommandHistory();
+
+        $this->assertEquals($expected, $history);
+    }
+
+    public function testGetResultErrorHistory_onHasError_shouldReturnExpectedValue()
+    {
+        //
+        // @expected
+        //
+        $expected = [
+            'ls: cannot access /foo: No such file or directory',
+        ];
+
+        try {
+            $template = ['ls %s', 'dir'];
+            $param = ['dir' => '/foo'];
+            $shell = new Shell($template, $param);
+            $shell->getResult();
+        } catch (ShellErrorException $e) {
+            $observer = static::observer();
+            $errors = $observer->getResultErrorHistory();
+        }
+
+        $this->assertEquals($expected, $errors);
+    }
+
+    public function testGetResultCounter_shouldReturnExpectedValue()
+    {
+        //
+        // shell #1
+        //
+        $shell1 = static::shell();
+
+        //
+        // shell #2
+        //
+        $template = ['ls %s', 'dir'];
+        $param = ['dir' => '/tmp'];
+        $shell2 = new Shell($template, $param);
+
+        //
+        // @expected
+        //
+        $expected = 2;
+
+        $shell1->getResult();
+        $shell2->getResult();
+
+        //
+        // get exec history from both shell#1 and shell#2
+        //
+        $observer = static::observer();
+        $counter = $observer->getResultCounter();
+
+        $this->assertEquals($expected, $counter);
+    }
+
+    public function testGetResultCounter_onError_shouldReturnExpectedValue()
+    {
+        //
+        // @expected
+        //
+        $expected = 0;
+
+        try {
+            $template = ['ls %s', 'dir'];
+            $param = ['dir' => '/foo'];
+            $shell = new Shell($template, $param);
+            $shell->getResult();
+        } catch (ShellErrorException $e) {
+            $observer = static::observer();
+            $counter = $observer->getResultCounter();
+        }
+
+        $this->assertEquals($expected, $counter);
+    }
 }

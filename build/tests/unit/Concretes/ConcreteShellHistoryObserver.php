@@ -10,7 +10,13 @@ class ConcreteShellHistoryObserver implements ShellObserverContract
     protected $execCommandHistory = [];
     protected $execErrorHistory = [];
     protected $execCounter = 0;
+    protected $resultCommandHistory = [];
+    protected $resultErrorHistory = [];
+    protected $resultCounter = 0;
 
+    //
+    // Implements required
+    //
     public function beforeExec(ShellContract $shell)
     {
         array_push(
@@ -32,6 +38,44 @@ class ConcreteShellHistoryObserver implements ShellObserverContract
         );
     }
 
+    public function beforeGetResult(ShellContract $shell)
+    {
+        array_push(
+            $this->resultCommandHistory, 
+            trim($shell->toString())
+        );
+    }
+
+    public function afterGetResult(ShellContract $shell, $out)
+    {
+        $this->resultCounter += 1;
+    }
+
+    public function onErrorGetResult(ShellContract $shell)
+    {
+        array_push(
+            $this->resultErrorHistory, 
+            trim($shell->getError())
+        );
+    }
+
+    public function beforeGetPaginate(ShellContract $shell)
+    {
+    }
+
+    public function afterGetPaginate(ShellContract $shell)
+    {
+    }
+
+    public function onErrorGetPaginate(ShellContract $shell)
+    {
+    }
+
+    //
+    // New implements
+    //
+    // from exec() command
+    //
     public function getExecCommandHistory()
     {
         return $this->execCommandHistory;
@@ -47,27 +91,21 @@ class ConcreteShellHistoryObserver implements ShellObserverContract
         return $this->execCounter;
     }
 
-    public function beforeGetResult(ShellContract $shell)
+    //
+    // from getResult() command
+    //
+    public function getResultCommandHistory()
     {
+        return $this->resultCommandHistory;
     }
 
-    public function afterGetResult(ShellContract $shell, $out)
+    public function getResultErrorHistory()
     {
+        return $this->resultErrorHistory;
     }
 
-    public function onErrorGetResult(ShellContract $shell)
+    public function getResultCounter()
     {
-    }
-
-    public function beforeGetPaginate(ShellContract $shell)
-    {
-    }
-
-    public function afterGetPaginate(ShellContract $shell)
-    {
-    }
-
-    public function onErrorGetPaginate(ShellContract $shell)
-    {
+        return $this->resultCounter;
     }
 }
